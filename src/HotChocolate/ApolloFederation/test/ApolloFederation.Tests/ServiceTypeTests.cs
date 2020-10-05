@@ -12,8 +12,7 @@ namespace HotChocolate.ApolloFederation
             // arrange
             ISchema schema = SchemaBuilder.New()
                 .AddApolloFederation()
-                .AddDocumentFromString(
-                    @"
+                .AddDocumentFromString(@"
                     type Query {
 
                     }
@@ -21,8 +20,7 @@ namespace HotChocolate.ApolloFederation
                     type Address @key(fields: ""matchCode"") {
                         matchCode: String!
                     }
-                "
-                )
+                ")
                 .Use(next => context => default)
                 .Create();
 
@@ -30,7 +28,7 @@ namespace HotChocolate.ApolloFederation
             ServiceType entityType = schema.GetType<ServiceType>(WellKnownTypeNames.Service);
 
             // assert
-            object? value = await entityType.Fields["sdl"].Resolver(new MockResolverContext(schema));
+            object? value = await entityType.Fields[WellKnownFieldNames.Sdl].Resolver(new MockResolverContext(schema));
             value.MatchSnapshot();
         }
 
@@ -40,8 +38,7 @@ namespace HotChocolate.ApolloFederation
             // arrange
             ISchema schema = SchemaBuilder.New()
                 .AddApolloFederation()
-                .AddDocumentFromString(
-                    @"
+                .AddDocumentFromString(@"
                     type Query {
                         address: Address!
                     }
@@ -49,8 +46,7 @@ namespace HotChocolate.ApolloFederation
                     type Address @key(fields: ""matchCode"") {
                         matchCode: String!
                     }
-                "
-                )
+                ")
                 .Use(next => context => default)
                 .Create();
 
@@ -58,7 +54,7 @@ namespace HotChocolate.ApolloFederation
             ServiceType entityType = schema.GetType<ServiceType>(WellKnownTypeNames.Service);
 
             // assert
-            object? value = await entityType.Fields["sdl"].Resolver(new MockResolverContext(schema));
+            object? value = await entityType.Fields[WellKnownFieldNames.Sdl].Resolver(new MockResolverContext(schema));
             value.MatchSnapshot();
         }
 
@@ -77,7 +73,7 @@ namespace HotChocolate.ApolloFederation
             ServiceType entityType = schema.GetType<ServiceType>(WellKnownTypeNames.Service);
 
             // assert
-            object? value = await entityType.Fields["sdl"].Resolver(new MockResolverContext(schema));
+            object? value = await entityType.Fields[WellKnownFieldNames.Sdl].Resolver(new MockResolverContext(schema));
             value.MatchSnapshot();
         }
 
@@ -94,7 +90,7 @@ namespace HotChocolate.ApolloFederation
             ServiceType entityType = schema.GetType<ServiceType>(WellKnownTypeNames.Service);
 
             // assert
-            object? value = await entityType.Fields["sdl"].Resolver(new MockResolverContext(schema));
+            object? value = await entityType.Fields[WellKnownFieldNames.Sdl].Resolver(new MockResolverContext(schema));
             value.MatchSnapshot();
         }
 
@@ -112,6 +108,5 @@ namespace HotChocolate.ApolloFederation
             [Key]
             public string MatchCode { get; set; }
         }
-
     }
 }

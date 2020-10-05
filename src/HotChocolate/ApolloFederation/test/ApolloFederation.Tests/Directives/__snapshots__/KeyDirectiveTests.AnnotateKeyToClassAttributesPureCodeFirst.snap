@@ -4,7 +4,7 @@
 
 type QueryOfTestTypePropertyDirectives {
   someField(id: Int!): TestTypePropertyDirectives!
-  _service: _Service
+  _service: _Service!
 }
 
 type TestTypePropertyDirectives @key(fields: "id name") {

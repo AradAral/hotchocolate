@@ -87,7 +87,10 @@ namespace HotChocolate.ApolloFederation
             throw new NotImplementedException();
         }
 
-        public IReadOnlyList<IFieldSelection> GetSelections(ObjectType typeContext, SelectionSetNode? selectionSet = null, bool allowInternals = false)
+        public IReadOnlyList<IFieldSelection> GetSelections(
+            ObjectType typeContext,
+            SelectionSetNode? selectionSet = null,
+            bool allowInternals = false)
         {
             throw new NotImplementedException();
         }

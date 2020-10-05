@@ -18,7 +18,7 @@ namespace HotChocolate.ApolloFederation
             descriptor
                 .Name(WellKnownTypeNames.Service)
                 .Description(FederationResources.ServiceType_Description)
-                .Field("sdl")
+                .Field(WellKnownFieldNames.Sdl)
                 .Type<NonNullType<StringType>>()
                 .Resolve(resolver => FederationSchemaPrinter.Print(resolver.Schema));
         }

@@ -13,6 +13,7 @@ namespace HotChocolate.ApolloFederation
             ISchema? schema = null;
             void action() => FederationSchemaPrinter.Print(schema);
 
+            // act
             // assert
             Assert.Throws<ArgumentNullException>(action);
         }
@@ -23,19 +24,20 @@ namespace HotChocolate.ApolloFederation
             // arrange
             ISchema schema = SchemaBuilder.New()
                 .AddApolloFederation()
-                .AddDocumentFromString(
-                @"
-                type TestType @key(fields: ""id"") {
-                    id: Int!
-                    name: String!
-                }
+                .AddDocumentFromString(@"
+                    type TestType @key(fields: ""id"") {
+                        id: Int!
+                        name: String!
+                    }
 
-                type Query {
-                    someField(a: Int): TestType
-                }")
+                    type Query {
+                        someField(a: Int): TestType
+                    }
+                ")
                 .Use(next => context => default)
                 .Create();
 
+            // act
             // assert
             FederationSchemaPrinter.Print(schema).MatchSnapshot();
         }
@@ -46,51 +48,51 @@ namespace HotChocolate.ApolloFederation
             // arrange
             ISchema schema = SchemaBuilder.New()
                 .AddApolloFederation()
-                .AddDocumentFromString(
-                    @"
-                type TestType @key(fields: ""id"") {
-                    id: Int!
-                    name: String!
-                    enum: SomeEnum
-                }
+                .AddDocumentFromString(@"
+                    type TestType @key(fields: ""id"") {
+                        id: Int!
+                        name: String!
+                        enum: SomeEnum
+                    }
 
-                type TestTypeTwo {
-                    id: Int!
-                }
+                    type TestTypeTwo {
+                        id: Int!
+                    }
 
-                interface iTestType @key(fields: ""id"") {
-                    id: Int!
-                    external: String! @external
-                }
+                    interface iTestType @key(fields: ""id"") {
+                        id: Int!
+                        external: String! @external
+                    }
 
-                union TestTypes = TestType | TestTypeTwo
+                    union TestTypes = TestType | TestTypeTwo
 
-                enum SomeEnum {
-                   FOO
-                   BAR
-                }
+                    enum SomeEnum {
+                       FOO
+                       BAR
+                    }
 
-                input SomeInput {
-                  name: String!
-                  description: String
-                  someEnum: SomeEnum
-                }
+                    input SomeInput {
+                      name: String!
+                      description: String
+                      someEnum: SomeEnum
+                    }
 
-                type Mutation {
-                    doSomething(input: SomeInput): Boolean
-                }
+                    type Mutation {
+                        doSomething(input: SomeInput): Boolean
+                    }
 
-                type Query implements iQuery {
-                    someField(a: Int): TestType
-                }
+                    type Query implements iQuery {
+                        someField(a: Int): TestType
+                    }
 
-                interface iQuery {
-                    someField(a: Int): TestType
-                }
+                    interface iQuery {
+                        someField(a: Int): TestType
+                    }
                 ")
                 .Use(next => context => default)
                 .Create();
 
+            // act
             // assert
             FederationSchemaPrinter.Print(schema).MatchSnapshot();
         }
@@ -114,6 +116,7 @@ namespace HotChocolate.ApolloFederation
                 .Use(next => context => default)
                 .Create();
 
+            // act
             // assert
             FederationSchemaPrinter.Print(schema).MatchSnapshot();
         }
@@ -127,7 +130,8 @@ namespace HotChocolate.ApolloFederation
                 .AddQueryType<QueryRoot<User>>()
                 .Create();
 
-            // check
+            // act
+            // assert
             FederationSchemaPrinter.Print(schema).MatchSnapshot();
         }
 
@@ -140,7 +144,8 @@ namespace HotChocolate.ApolloFederation
                 .AddQueryType<QueryRoot<Product>>()
                 .Create();
 
-            // check
+            // act
+            // assert
             FederationSchemaPrinter.Print(schema).MatchSnapshot();
         }
 

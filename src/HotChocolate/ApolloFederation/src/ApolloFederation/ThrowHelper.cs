@@ -52,7 +52,6 @@ namespace HotChocolate.ApolloFederation
                     .SetCode(ErrorCodes.Apollo.Federation.NoEntitiesDeclared)
                     .Build());
 
-
         /// <summary>
         /// The key attribute is used on the type level without specifying the the
         /// fieldset.

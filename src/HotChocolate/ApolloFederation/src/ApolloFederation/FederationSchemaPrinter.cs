@@ -9,12 +9,6 @@ namespace HotChocolate.ApolloFederation
 {
     public static class FederationSchemaPrinter
     {
-        private static readonly HashSet<Type> _apolloFederationTypeAdditions = new HashSet<Type>
-        {
-            typeof(EntityType),
-            typeof(ServiceType)
-        };
-
         public static string Print(ISchema schema)
         {
             if (schema is null)
@@ -34,17 +28,14 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeNonScalarTypeDefinition(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .Where(node => node != null)
                 .OfType<IDefinitionNode>()
                 .ToList();
 
             return new DocumentNode(
                 null,
-                typeDefinitions
-            );
+                typeDefinitions);
         }
 
         private static IEnumerable<INamedType> GetNonScalarTypes(
@@ -52,7 +43,7 @@ namespace HotChocolate.ApolloFederation
         {
             return schema.Types
                 .Where(t => IsPublicAndNoScalar(t))
-                .Where(t => IsNotApolloTypeAddition(t))
+                .Where(t => !IsApolloTypeAddition(t))
                 .OrderBy(
                     t => t.Name.ToString(),
                     StringComparer.Ordinal
@@ -62,26 +53,20 @@ namespace HotChocolate.ApolloFederation
                 .SelectMany(t => t);
         }
 
-        private static bool IsNotApolloTypeAddition(INamedType type)
+        private static bool IsApolloTypeAddition(INamedType type)
         {
-            if (_apolloFederationTypeAdditions.Contains(type.GetType()))
+            if (type is EntityType || type is ServiceType)
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private static bool IsPublicAndNoScalar(INamedType type)
-        {
-            if (IntrospectionTypes.IsIntrospectionType(type.Name)
-                || type is ScalarType scalarType)
-            {
-                return false;
-            }
+            => !IntrospectionTypes.IsIntrospectionType(type.Name) &&
+               !(type is ScalarType);
 
-            return true;
-        }
 
         private static IDefinitionNode? SerializeNonScalarTypeDefinition(
             INamedType namedType,
@@ -92,32 +77,27 @@ namespace HotChocolate.ApolloFederation
                 case ObjectType type:
                     return SerializeObjectType(
                         type,
-                        referenced
-                    );
+                        referenced);
 
                 case InterfaceType type:
                     return SerializeInterfaceType(
                         type,
-                        referenced
-                    );
+                        referenced);
 
                 case InputObjectType type:
                     return SerializeInputObjectType(
                         type,
-                        referenced
-                    );
+                        referenced);
 
                 case UnionType type:
                     return SerializeUnionType(
                         type,
-                        referenced
-                    );
+                        referenced);
 
                 case EnumType type:
                     return SerializeEnumType(
                         type,
-                        referenced
-                    );
+                        referenced);
 
                 default:
                     throw new NotSupportedException();
@@ -132,29 +112,23 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var interfaces = objectType.Interfaces
                 .Select(
                     t => SerializeNamedType(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var fields = objectType.Fields
                 .Where(t => !t.IsIntrospectionField)
-                .Where(t => IsNotApolloTypeAddition(t.Type.NamedType()))
+                .Where(t => !IsApolloTypeAddition(t.Type.NamedType()))
                 .Select(
                     t => SerializeObjectField(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             if (fields.Count == 0)
@@ -169,8 +143,7 @@ namespace HotChocolate.ApolloFederation
                     new NameNode(objectType.Name),
                     directives,
                     interfaces,
-                    fields
-                );
+                    fields);
             }
 
             return new ObjectTypeDefinitionNode(
@@ -179,8 +152,7 @@ namespace HotChocolate.ApolloFederation
                 SerializeDescription(objectType.Description),
                 directives,
                 interfaces,
-                fields
-            );
+                fields);
         }
 
         private static InterfaceTypeDefinitionNode SerializeInterfaceType(
@@ -191,18 +163,14 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var fields = interfaceType.Fields
                 .Select(
                     t => SerializeObjectField(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             return new InterfaceTypeDefinitionNode(
@@ -211,8 +179,7 @@ namespace HotChocolate.ApolloFederation
                 SerializeDescription(interfaceType.Description),
                 directives,
                 Array.Empty<NamedTypeNode>(),
-                fields
-            );
+                fields);
         }
 
         private static InputObjectTypeDefinitionNode SerializeInputObjectType(
@@ -223,18 +190,14 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var fields = inputObjectType.Fields
                 .Select(
                     t => SerializeInputField(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             return new InputObjectTypeDefinitionNode(
@@ -242,8 +205,7 @@ namespace HotChocolate.ApolloFederation
                 new NameNode(inputObjectType.Name),
                 SerializeDescription(inputObjectType.Description),
                 directives,
-                fields
-            );
+                fields);
         }
 
         private static UnionTypeDefinitionNode SerializeUnionType(
@@ -254,18 +216,14 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var types = unionType.Types.Values
                 .Select(
                     t => SerializeNamedType(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             return new UnionTypeDefinitionNode(
@@ -273,8 +231,7 @@ namespace HotChocolate.ApolloFederation
                 new NameNode(unionType.Name),
                 SerializeDescription(unionType.Description),
                 directives,
-                types
-            );
+                types);
         }
 
         private static EnumTypeDefinitionNode SerializeEnumType(
@@ -285,18 +242,14 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var values = enumType.Values
                 .Select(
                     t => SerializeEnumValue(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             return new EnumTypeDefinitionNode(
@@ -304,8 +257,7 @@ namespace HotChocolate.ApolloFederation
                 new NameNode(enumType.Name),
                 SerializeDescription(enumType.Description),
                 directives,
-                values
-            );
+                values);
         }
 
 
@@ -317,9 +269,7 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             return new EnumValueDefinitionNode(
@@ -338,18 +288,14 @@ namespace HotChocolate.ApolloFederation
                 .Select(
                     t => SerializeInputField(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             var directives = field.Directives
                 .Select(
                     t => SerializeDirective(
                         t,
-                        referenced
-                    )
-                )
+                        referenced))
                 .ToList();
 
             return new FieldDefinitionNode(
@@ -361,8 +307,7 @@ namespace HotChocolate.ApolloFederation
                     field.Type,
                     referenced
                 ),
-                directives
-            );
+                directives);
         }
 
         private static InputValueDefinitionNode SerializeInputField(
@@ -375,16 +320,15 @@ namespace HotChocolate.ApolloFederation
                 SerializeDescription(inputValue.Description),
                 SerializeType(
                     inputValue.Type,
-                    referenced
-                ),
+                    referenced),
                 inputValue.DefaultValue,
-                inputValue.Directives.Select(
-                    t =>
-                        SerializeDirective(
-                            t,
-                            referenced
-                        )
-                ).ToList()
+                inputValue.Directives
+                    .Select(
+                        t =>
+                            SerializeDirective(
+                                t,
+                                referenced))
+                    .ToList()
             );
         }
 
@@ -398,9 +342,7 @@ namespace HotChocolate.ApolloFederation
                     null,
                     (INullableTypeNode)SerializeType(
                         nt.Type,
-                        referenced
-                    )
-                );
+                        referenced));
             }
 
             if (type is ListType lt)
@@ -409,17 +351,14 @@ namespace HotChocolate.ApolloFederation
                     null,
                     SerializeType(
                         lt.ElementType,
-                        referenced
-                    )
-                );
+                        referenced));
             }
 
             if (type is INamedType namedType)
             {
                 return SerializeNamedType(
                     namedType,
-                    referenced
-                );
+                    referenced);
             }
 
             throw new NotSupportedException();
@@ -432,8 +371,7 @@ namespace HotChocolate.ApolloFederation
             referenced.TypeNames.Add(namedType.Name);
             return new NamedTypeNode(
                 null,
-                new NameNode(namedType.Name)
-            );
+                new NameNode(namedType.Name));
         }
 
         private static DirectiveNode SerializeDirective(

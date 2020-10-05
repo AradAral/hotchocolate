@@ -113,7 +113,6 @@ namespace HotChocolate.ApolloFederation
                         .AddApolloFederation()
                         .AddQueryType<Query<Address>>()
                         .Create();
-
                 };
             var exception = Assert.Throws<SchemaException>(createSchema);
             Assert.Contains(ThrowHelper_EntityType_NoEntities ,exception.Message);

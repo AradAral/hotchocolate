@@ -66,7 +66,7 @@ namespace HotChocolate.ApolloFederation
                     WellKnownFieldNames.Service);
                 fieldDescriptor
                     .Type<NonNullType<ServiceType>>()
-                    .Resolver(ctx => new ServiceType());
+                    .Resolver(default(object));
                 objectTypeDefinition.Fields.Add(fieldDescriptor.CreateDefinition());
             }
         }

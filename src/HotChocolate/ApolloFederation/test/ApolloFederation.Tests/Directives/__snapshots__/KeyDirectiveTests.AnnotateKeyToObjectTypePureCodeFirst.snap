@@ -4,7 +4,7 @@
 
 type QueryOfTestTypeClassDirective {
   someField(id: Int!): TestTypeClassDirective!
-  _service: _Service
+  _service: _Service!
 }
 
 type TestTypeClassDirective @key(fields: "id") {

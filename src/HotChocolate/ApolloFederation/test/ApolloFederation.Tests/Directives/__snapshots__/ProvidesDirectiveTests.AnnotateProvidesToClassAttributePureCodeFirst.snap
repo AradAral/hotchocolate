@@ -8,7 +8,7 @@ type Product {
 
 type Query {
   someField(id: Int!): Review!
-  _service: _Service
+  _service: _Service!
 }
 
 type Review @key(fields: "id") {
