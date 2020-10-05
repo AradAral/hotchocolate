@@ -53,18 +53,11 @@ namespace HotChocolate.ApolloFederation
                 .SelectMany(t => t);
         }
 
-        private static bool IsApolloTypeAddition(INamedType type)
-        {
-            if (type is EntityType || type is ServiceType)
-            {
-                return true;
-            }
+        private static bool IsApolloTypeAddition(INamedType type) =>
+            type is EntityType || type is ServiceType;
 
-            return false;
-        }
-
-        private static bool IsPublicAndNoScalar(INamedType type)
-            => !IntrospectionTypes.IsIntrospectionType(type.Name) &&
+        private static bool IsPublicAndNoScalar(INamedType type) =>
+            !IntrospectionTypes.IsIntrospectionType(type.Name) &&
                !(type is ScalarType);
 
 
@@ -305,8 +298,7 @@ namespace HotChocolate.ApolloFederation
                 arguments,
                 SerializeType(
                     field.Type,
-                    referenced
-                ),
+                    referenced),
                 directives);
         }
 

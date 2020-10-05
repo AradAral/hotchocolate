@@ -34,7 +34,7 @@ namespace HotChocolate.ApolloFederation
         public override void OnTypesInitialized(
             IReadOnlyCollection<ITypeDiscoveryContext> discoveryContexts)
         {
-            if (!_entityTypes.Any())
+            if (_entityTypes.Count == 0)
             {
                 throw EntityType_NoEntities();
             }
